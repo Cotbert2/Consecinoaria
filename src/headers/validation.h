@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 #include <regex>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -55,6 +58,56 @@ bool validar_cedula(long int x){
         return (false);
 }
 
+
+bool hasAlreadyExist(string cedToFind){
+    int counter = 0;
+    bool exist = false;
+    string cedula, Name, email, mobile, direction; 
+    ifstream reader("./db/Users.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> cedula;
+        reader >> Name;
+        reader >> email;
+        reader >> mobile;
+        reader >> direction;
+        if(cedula == cedToFind){
+            exist = true;
+            break;
+        }
+    }
+
+    reader.close();
+    return exist;
+}
+
+bool hasAlreadyExistPrint(string cedToFind){
+    int counter = 0;
+    bool exist = false;
+    string cedula, Name, email, mobile, direction; 
+    ifstream reader("./db/Users.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> cedula;
+        reader >> Name;
+        reader >> email;
+        reader >> mobile;
+        reader >> direction;
+        if(cedula == cedToFind){
+            printf("*************************************** \n");
+            cout << "*\tCedula: " << cedula <<  "            *\n";
+            printf("***************************************\n");
+            cout << "Nombre: " << Name <<  "\n";
+            cout << "Telefono: " << mobile <<  "\n";
+            cout << "Direccion: " << direction <<  "\n";
+            cout << "Email: " << email <<  "\n";
+            exist = true;
+            break;
+        }
+    }
+
+    reader.close();
+    return exist;
+}
+
 bool validateNameBool(char nombre[dim]) {
     const regex expReg("^[a-zA-Z ]+{2,20}");
     return regex_match(nombre, expReg); 
@@ -83,7 +136,9 @@ long int validateCed(){
         scanf("%li",&ced);
         if(!validar_cedula(ced))
             printf("[-] Ingrese una cedula valida \n");
-    }while(!validar_cedula(ced));
+        if(hasAlreadyExist(std::to_string(ced)))
+            printf("[-] La cedula ingresada ya existe\n");
+    }while(!validar_cedula(ced) || hasAlreadyExist(std::to_string(ced)));
     return ced;
 }
 

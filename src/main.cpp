@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <ios>
@@ -17,7 +18,6 @@ using namespace std;
 struct CarProperties{
     char model[stringSize];
     int year;
-    char color[stringSize];
     double price;
 };
 
@@ -52,52 +52,52 @@ bool hasAlreadyExist(char myCed[stringSize]){
     printf("%s", Nom);
     while(!reader.eof()){
         reader >> Nom;
-        if(myCed == ){
+//        if(myCed == ){
 
-        }
+  //      }
     }
     return true;
 }
 
-void printUser(Client client){
-    printf("Cedula: %li", client.id);
-    printf("Nombre: %s", client.fullName);
-    printf("Telefono: %s", client.cellPhoneNumber);
-    printf("Direccion:  %s", client.direction);
-    printf("Email: %s", client.email);
-}
-
 int usersNum(){
+    Client client;
     int counter = 0;
     ifstream reader("./db/Users.txt", ios::in);
     while (!reader.eof()) {
-        counter++;    
+
     }
     reader.close();    
+
     return counter;
 }
 
-bool seeUsers(char myCed[stringSize]){
+void seeUsers(){
     int counter = 0;
+    Client client;
+
+    string cedula, Name, email, mobile, direction; 
     ifstream reader("./db/Users.txt", ios::in);
     while (!reader.eof()) {
-        counter++;    
+        reader >> cedula;
+        reader >> Name;
+        reader >> email;
+        reader >> mobile;
+        reader >> direction;
+        if(cedula == ""){
+            printf("[-] No hay informacion para mostrar");
+        } else {
+            printf("*************************************** \n");
+            cout << "*\tCedula: " << cedula <<  "            *\n";
+            printf("***************************************\n");
+            cout << "Nombre: " << Name <<  "\n";
+            cout << "Telefono: " << mobile <<  "\n";
+            cout << "Direccion: " << direction <<  "\n";
+            cout << "Email: " << email <<  "\n";
+        }
     }
-    
     reader.close();
-    char Nom[stringSize];
 }
 
-/*bool hasAlreadyExist(string id_ced){
-    ifstream myRead("./db/Users.txt");
-    string Name;
-    string Ced;
-    string LastName;
-    myRead >> Name;
-    while(!myRead.eof()){
-        myRead>>
-    }
-}*/
 
 
 void inClient(){
@@ -135,6 +135,21 @@ void addNewUser (ofstream &myFile ){
     myFile.open("Users.txt", ios::out | ios::app);
 }
 
+void findClient(){
+    long int ced;
+    system("clear");
+    do{
+        printf("Ingrese la cedula del cliente que desea buscar o ingrese 8 para salir: ");
+        scanf("%li",&ced);
+        if(ced == 8){
+            printf("Volviendo al menu principal....\n");
+            break;
+        }
+        if (!hasAlreadyExistPrint(std::to_string(ced)))
+            printf("[-] No se ha encontrado al cliente \n");
+    }while(!hasAlreadyExist(std::to_string(ced)) && ced == 8);
+}
+
 void menu(){
     int option;
     Client client;
@@ -158,20 +173,26 @@ void menu(){
                 break;
 
             case 7:
-                goodBye();
+                system("clear");
+                seeUsers();
+                break;
+
+            case 9:
+                system("clear");
+                findClient();
                 break;
             case 13:
                 goodBye();
                 break;
             default:
-                
-            break;
+                printf("La opcion que Ingresaste no existe");                
+                break;
         }
     }while(option != 13);
 }
 
 int main(){
-    hasAlreadyExist();
+    system("clear");
     welcome();
     branch();
     menu();
