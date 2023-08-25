@@ -1,7 +1,9 @@
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ios>
+#include <ostream>
 #include<stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,7 +33,7 @@ struct Car{
 
 
 struct Client{
-    long int id; //cedula
+    long int id; 
     char fullName[stringSize];
     char email[stringSize];
     char direction[stringSize];
@@ -40,7 +42,7 @@ struct Client{
 
 struct Sell{
     int id;
-    //date
+    int monthsToDelivery;
     float totalTaxes;
     Client dataClient;
     Car dataCar;
@@ -51,11 +53,12 @@ void seeUsers(){
     int counter = 0;
     Client client;
 
-    string cedula, Name, email, mobile, direction; 
+    string cedula, Name, LastName, email, mobile, direction; 
     ifstream reader("./db/Users.txt", ios::in);
     while (!reader.eof()) {
         reader >> cedula;
         reader >> Name;
+        reader >> LastName;
         reader >> email;
         reader >> mobile;
         reader >> direction;
@@ -65,7 +68,7 @@ void seeUsers(){
             printf("*************************************** \n");
             cout << "*\tCedula: " << cedula <<  "            *\n";
             printf("***************************************\n");
-            cout << "Nombre: " << Name <<  "\n";
+            cout << "Nombre: " << Name <<  LastName<<"\n";
             cout << "Telefono: " << mobile <<  "\n";
             cout << "Direccion: " << direction <<  "\n";
             cout << "Email: " << email <<  "\n";
@@ -73,6 +76,34 @@ void seeUsers(){
     }
     reader.close();
 }
+
+void printAllSales(){
+    string id, comprador, modelo, precio, impuestos, meses; 
+    ifstream reader("./db/Salles.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> id;
+        reader >> comprador;
+        reader >> modelo;
+        reader >> precio;
+        reader >> impuestos;
+        reader >> meses;
+        if(id == ""){
+            printf("[-] No hay informacion para mostrar");
+        } else {
+            printf("*************************************** \n");
+            cout << "*\tCedula: " << id <<  "            *\n";
+            printf("***************************************\n");
+            cout << "-> Cédula del cliente: " << comprador <<"\n";
+            cout << "-> Modelo: " << modelo <<  "\n";
+            cout << "-> Precio: " << precio <<  "\n";
+            cout << "IVA(12%):  " << impuestos<<  "\n";
+            cout << "->Total:   " << std::stoi(precio) +std::stoi(impuestos) <<  "\n";  
+        }
+    }
+}
+
+
+
 
 
 void openImage(char path[]){
@@ -109,6 +140,8 @@ void seeCars(){
 
 
 
+
+
 void inClient(){
     Client client;
     ofstream myFile;
@@ -123,6 +156,7 @@ void inClient(){
     myFile.close();
     system("clear");
 }
+
 
 void inNewCar(Car * car){
     car->id = randomNum();
@@ -142,15 +176,32 @@ void inNewCar(Car * car){
     system("clear");
 }
 
-
 void inNewSell(Sell *sell){
+    ofstream myFile;
     sell->id = randomNum();
-    getDataClient(&sell->dataClient.id);
+    sell->monthsToDelivery = valiateMonths();
+    do{
+        printf("Ingresa la cedula del cliente: ");
+        scanf("%li",&sell->dataClient.id);
+        if(!hasAlreadyExist(std::to_string(sell->dataClient.id)))
+            printf("[-] El cliente no ha sido encontrado\n");
+    }while(!hasAlreadyExist((std::to_string(sell->dataClient.id))));
+
+    do{
+        printf("Ingresa el modelo del auto: ");
+        scanf(" %[^\n]",sell->dataCar.car.model);
+        if(!hasAlreadyExistCar(sell->dataCar.car.model))
+            printf("[-] El modelo no ha sido encontrado\n");
+    }while(!hasAlreadyExistCar(sell->dataCar.car.model));
+    sell->dataCar.car.price = carPrice(sell->dataCar.car.model);
+    sell->totalTaxes = makeTaxes(sell->dataCar.car.price);
+    myFile.open("./db/Salles.txt", ios::out | ios::app);
+    myFile<<sell->id<<" "<<sell->dataClient.id<<" "<< sell->dataCar.car.model<<" "<< sell->dataCar.car.price<<" "<< sell->totalTaxes <<" "<< sell->monthsToDelivery<< endl;
+    myFile.close();
+    system("clear");
 }
 
-void addNewUser (ofstream &myFile ){
-    myFile.open("Users.txt", ios::out | ios::app);
-}
+
 
 void findClient(){
     long int ced;
@@ -177,9 +228,193 @@ void findCar(){
             printf("Volviendo al menu principal....\n");
             break;
         }
-        if (!hasAlreadyExistCarPrint(modelToFind))
+        if (hasAlreadyExistCarPrint(modelToFind))
             printf("[-] No se ha encontrado al auto \n");
-    }while(!hasAlreadyExistCar(modelToFind) && modelToFind == "8");
+    }while(!hasAlreadyExistCar(modelToFind) || modelToFind != "8");
+}
+
+void deleteCed(string cedToDelete){
+    ifstream myRead;
+    string cedula, Name, LastName, email, mobile, city;
+    
+    myRead.open("./db/Users.txt");
+    ofstream aux("./db/auxiliciar.txt",ios::out);
+
+    while(!myRead.eof()){
+        myRead >> cedula;
+        myRead >> Name;
+        myRead >> LastName;
+        myRead >> email;
+        myRead >> mobile;
+        myRead >> city;
+        if(!(cedula == cedToDelete)){
+            aux<<cedula<<" "<<Name<<" "<<LastName<<" "<< email<<" "<<mobile<<" "<<city<<" "<<endl;
+        }
+    }
+    myRead.close();
+    aux.close();
+    remove("./db/Users.txt");
+    rename("./db/auxiliciar.txt","./db/Users.txt");
+
+}
+
+void modifyModel(string myModel){
+    ifstream myRead;
+    string id, Model, year, price, path;
+    
+    myRead.open("./db/Cars.txt");
+    ofstream aux("./db/auxiliciar.txt",ios::out);
+    int yearAux = validateYearCar();
+    float priceAux = validatePrice();
+    char  pathAux[stringSize];
+    validatePath(pathAux);
+
+
+    while(!myRead.eof()){
+        myRead >> id;
+        myRead >> Model;
+        myRead >> year;
+        myRead >> price;
+        myRead >> path;
+
+        if(!(Model == myModel)){
+            
+            aux<<id<<" "<<Model<<" "<<year<<" "<< price<<" "<<path<<endl;
+        }else {
+            aux<<id<<" "<<Model<<" "<<yearAux<<" "<< priceAux<<" "<<pathAux<<endl;
+        }
+    }
+    myRead.close();
+    aux.close();
+    remove("./db/Cars.txt");
+    rename("./db/auxiliciar.txt","./db/Cars.txt");
+}
+
+void modifyCed(string cedToDelete){
+    ifstream myRead;
+    string cedula, Name, LastName, email, mobile, city;
+    int opt;
+    
+    myRead.open("./db/Users.txt");
+    ofstream aux("./db/auxiliciar.txt",ios::out);
+    char NameAux[stringSize], emailAux[stringSize],directionAux[stringSize],mobileAux[stringSize];
+
+
+
+    //TODO
+
+
+
+    
+    validateName(NameAux);
+    validateEmail(emailAux);
+    validateDirecction(directionAux);
+    validateMobile(mobileAux);
+
+    while(!myRead.eof()){
+        myRead >> cedula;
+        myRead >> Name;
+        myRead >> LastName;
+        myRead >> email;
+        myRead >> mobile;
+        myRead >> city;
+        if(!(cedula == cedToDelete)){
+            aux<<cedula<<" "<<Name<<" "<<LastName<<" "<< email<<" "<<mobile<<" "<<city<<" "<<endl;
+        }else {
+            aux<<cedula<<" "<<NameAux<<" "<< emailAux<<" "<<mobileAux<<" "<<directionAux<<" "<<endl;
+        }
+    }
+    myRead.close();
+    aux.close();
+    remove("./db/Users.txt");
+    rename("./db/auxiliciar.txt","./db/Users.txt");
+
+}
+
+
+
+
+
+void deleteModel(string myModel){
+    ifstream myRead;
+    string id, Model, year, price, path;
+    
+    myRead.open("./db/Cars.txt");
+    ofstream aux("./db/auxiliciar.txt",ios::out);
+
+    while(!myRead.eof()){
+        myRead >> id;
+        myRead >> Model;
+        myRead >> year;
+        myRead >> price;
+        myRead >> path;
+
+        if(!(Model == myModel)){
+            
+            aux<<id<<" "<<Model<<" "<<year<<" "<< price<<" "<<path<<endl;
+        }
+    }
+    myRead.close();
+    aux.close();
+    remove("./db/Cars.txt");
+    rename("./db/auxiliciar.txt","./db/Cars.txt");
+}
+
+
+void deleteUser(){
+    long int ced;
+    do{
+        printf("Ingrese la cédula del usuario que desea eliminar, o ingrese 8 para salir\n");
+        scanf("%li",&ced);
+        if(ced == 8)
+            return;
+        if(!hasAlreadyExist(std::to_string(ced)) )
+            printf("[-] No se encontró la cédula Ingresada");
+    }while(!hasAlreadyExist(std::to_string(ced)));
+
+    deleteCed(std::to_string(ced));
+}
+
+void deleteCar(){
+    string myModel;
+    do{
+        printf("Ingrese el modelo de auto que desea eliminar, o ingrese 8 para salir\n");
+        cin>>myModel;
+        if(myModel == "8")
+            return;
+        if(!hasAlreadyExistCar(myModel ))
+            printf("[-] No se encontró el modelo Ingresado\n");
+    }while(!hasAlreadyExistCar(myModel));
+
+    deleteModel(myModel);
+}
+
+void modifyCar(){
+    string myModel;
+    do{
+        printf("Ingrese el modelo de auto que desea eliminar, o ingrese 8 para salir\n");
+        cin>>myModel;
+        if(myModel == "8")
+            return;
+        if(!hasAlreadyExistCar(myModel ))
+            printf("[-] No se encontró el modelo Ingresado\n");
+    }while(!hasAlreadyExistCar(myModel));
+    modifyModel(myModel);
+    //deleteModel(myModel);
+
+}
+
+void modifyUser(){
+    long int ced;
+    do{
+        printf("Ingrese la cédula del usuario que desea modificar, o ingrese 8 para salir\n");
+        scanf("%li",&ced);
+        if(ced == 8)
+            return;
+        if(!hasAlreadyExist(std::to_string(ced)) )
+            printf("[-] No se encontró la cédula Ingresada");
+    }while(!hasAlreadyExist(std::to_string(ced)));
+    modifyCed(std::to_string(ced));
 }
 
 void menu(){
@@ -203,8 +438,23 @@ void menu(){
                 inNewCar(&car);
                 break;
 
-            case 3: // New Sell
+            case 3: // New Sell DONE
+                system("clear");
                 inNewSell(&sell);
+                break;
+
+            case 4: // Modificar Informacion de un auto // DONE
+                system("clear");
+                modifyCar();
+                break;
+
+            case 5: //Modificar Informacion de un cliente //DONE
+                system("clear");
+                modifyUser();
+                break;
+            
+            case 6: //Modificar Informacion de la venta
+                system("clear");
                 break;
 
             case 7: //See All clients DONE
@@ -226,17 +476,30 @@ void menu(){
                 system("clear");
                 findCar();
                 break;
-        
 
-            case 13: //DONE
+            case 11: //Delete user DONE
+                system("clear");
+                deleteUser();
+                break;
+            
+            case 12: //Delete car DONE
+                system("clear");
+                deleteCar();
+                break;
+
+            case 13:
+                printAllSales();
+                break;
+
+            case 0: //DONE
                 goodBye();
                 break;
             
-            default:
-                printf("La opcion que Ingresaste no existe");                
+            default: //DONE
+                printf("La opcion que Ingresaste no existe\n");                
                 break;
         }
-    }while(option != 13);
+    }while(option != 0);
 }
 
 int main(){

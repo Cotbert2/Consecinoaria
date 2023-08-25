@@ -63,11 +63,12 @@ bool validar_cedula(long int x){
 bool hasAlreadyExist(string cedToFind){
     int counter = 0;
     bool exist = false;
-    string cedula, Name, email, mobile, direction; 
+    string cedula, Name, LastName, email, mobile, direction; 
     ifstream reader("./db/Users.txt", ios::in);
     while (!reader.eof()) {
         reader >> cedula;
         reader >> Name;
+        reader >> LastName;
         reader >> email;
         reader >> mobile;
         reader >> direction;
@@ -127,14 +128,35 @@ bool hasAlreadyExistCarPrint(string modelToFind){
 }
 
 
+float carPrice(string modelToFind){
+    char tagPath[100];
+    bool exist = false;
+    string id, Model, year, cost, path; 
+    ifstream reader("./db/Cars.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> id;
+        reader >> Model;
+        reader >> year;
+        reader >> cost;
+        reader >> path;
+        if(Model == modelToFind){
+            return (std::stof(cost));
+        }
+    }
+    reader.close();
+    return exist;
+}
+
+
 bool hasAlreadyExistPrint(string cedToFind){
     int counter = 0;
     bool exist = false;
-    string cedula, Name, email, mobile, direction; 
+    string cedula, Name, LastName, email, mobile, direction; 
     ifstream reader("./db/Users.txt", ios::in);
     while (!reader.eof()) {
         reader >> cedula;
         reader >> Name;
+        reader >> LastName;
         reader >> email;
         reader >> mobile;
         reader >> direction;
@@ -266,4 +288,14 @@ void validatePath(char myPath[dim]){
         if(!validarPathBool(myPath))
             printf("[-] Ruta no válida\n");
     }while(!validarPathBool(myPath));  
+}
+int valiateMonths(){
+    int val;
+    do{
+        printf("Ingresa los meses en los que se entregará el auto: ");
+        scanf("%i",&val);
+        if(!(val > 0 && val <= 24))
+            printf("[-] Cantidad de meses inválida \n");
+    }while(!(val > 0 && val <= 24));
+    return val;
 }

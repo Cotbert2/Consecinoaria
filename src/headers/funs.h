@@ -31,10 +31,22 @@ void printMenu(){
     printf("8. Ver todos los autos \n");
     printf("9. Buscar Cliente\n");
     printf("10.Buscar auto\n");
-    printf("13.Salir\n");
+    printf("11.Eliminar Cliente\n");
+    printf("12.Eliminar Auto\n");
+    printf("13.Ver Ventas\n");
+    printf("0.Salir\n");
 
 
     printf("Ingresa una opcion: ");
+}
+
+void menuClient(){
+    printf("Que dato desea cambiar\n");
+    printf("1. Nombre\n");
+    printf("2. Correo\n");
+    printf("3. Dirección\n");
+    printf("4. Numero de telefono\n");
+    printf("5. Salir\n");
 }
 
 void goodBye(){
@@ -59,3 +71,8 @@ int randomNum(){
    numero_aleatorio = minimo + rand() % (maximo - minimo + 1);
    return (numero_aleatorio);
 }
+
+float makeTaxes(float value){
+    return (value * 0.12);
+}
+
