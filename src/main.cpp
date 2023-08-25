@@ -171,7 +171,7 @@ void inNewCar(Car * car){
     car->car.price = validatePrice();
     validatePath(car->car.photo);
     myFile.open("./db/Cars.txt", ios::out | ios::app);
-    myFile<<car->id<<" "<<car->car.model<<" "<< car->car.price<<" "<< car->car.photo<<endl;
+    myFile<<car->id<<" "<<car->car.model<<" "<< car->car.year<<" "<< car->car.price<<" "<< car->car.photo<<endl;
     myFile.close();
     system("clear");
 }
@@ -453,43 +453,45 @@ void menu(){
                 modifyUser();
                 break;
             
-            case 6: //Modificar Informacion de la venta
-                system("clear");
-                break;
 
-            case 7: //See All clients DONE
+            case 6: //See All clients DONE
                 system("clear");
                 seeUsers();
                 break;
             
-            case 8: //See All Cars DONE
+            case 7: //See All Cars DONE
                 system("clear");
                 seeCars();
                 break;
 
-            case 9: //Find Client Info DONE
+            case 8: //Find Client Info DONE
                 system("clear");
                 findClient();
                 break;
             
-            case 10: //Find Car Info DONE
+            case 9: //Find Car Info DONE
                 system("clear");
                 findCar();
                 break;
 
-            case 11: //Delete user DONE
+            case 10: //Delete user DONE
                 system("clear");
                 deleteUser();
                 break;
             
-            case 12: //Delete car DONE
+            case 11: //Delete car DONE
                 system("clear");
                 deleteCar();
                 break;
 
-            case 13:
+            case 12:
                 printAllSales();
                 break;
+
+            case 13:
+                system("xdg-open file:///home/mateo/Documents/universidad/final_project/web/index.html");
+                break;
+
 
             case 0: //DONE
                 goodBye();

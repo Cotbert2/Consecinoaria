@@ -25,15 +25,15 @@ void printMenu(){
     //Update
     printf("4. Modificar Informacion de un Auto\n");
     printf("5. Modificar Informacion de un Cliente\n");
-    printf("6. Modificar Informacion de la venta\n");
     //Read
-    printf("7. Ver todos los clientes\n");
-    printf("8. Ver todos los autos \n");
-    printf("9. Buscar Cliente\n");
-    printf("10.Buscar auto\n");
-    printf("11.Eliminar Cliente\n");
-    printf("12.Eliminar Auto\n");
-    printf("13.Ver Ventas\n");
+    printf("6. Ver todos los clientes\n");
+    printf("7. Ver todos los autos \n");
+    printf("8. Buscar Cliente\n");
+    printf("9.Buscar auto\n");
+    printf("10.Eliminar Cliente\n");
+    printf("11.Eliminar Auto\n");
+    printf("12.Ver Ventas\n");
+    printf("13. Visitar nuestra web\n");
     printf("0.Salir\n");
 
 

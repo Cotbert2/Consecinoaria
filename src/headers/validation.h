@@ -178,7 +178,7 @@ bool hasAlreadyExistPrint(string cedToFind){
 }
 
 bool validateNameBool(char nombre[dim]) {
-    const regex expReg("^[a-zA-Z ]+{2,20}");
+    const regex expReg("^[A-Za-z]+ [A-Za-z]+$");
     return regex_match(nombre, expReg); 
 }
 
@@ -194,7 +194,7 @@ bool validarPathBool(char myPath[dim]) {
 
 
 bool validateDirectionBool(char direction[dim]){
-    const regex expReg("^.{3,}$");
+    const regex expReg("^[A-Za-z]+$");
     return regex_match(direction, expReg);
 }
 
