@@ -31,11 +31,9 @@ void printMenu(){
     printf("8. Ver todos los autos \n");
     printf("9. Buscar Cliente\n");
     printf("10.Buscar auto\n");
+    printf("13.Salir\n");
 
 
-
-    printf("6. Modificar Informacion de la venta\n");
-    printf("5. Ver vehiculos disponibles\n"); 
     printf("Ingresa una opcion: ");
 }
 

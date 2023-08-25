@@ -19,6 +19,7 @@ struct CarProperties{
     char model[stringSize];
     int year;
     double price;
+    char photo[stringSize];
 };
 
 
@@ -45,31 +46,6 @@ struct Sell{
     Car dataCar;
 };
 
-bool hasAlreadyExist(char myCed[stringSize]){
-    ifstream reader("./db/Users.txt", ios::in);
-    char Nom[stringSize];
-    reader >> Nom;
-    printf("%s", Nom);
-    while(!reader.eof()){
-        reader >> Nom;
-//        if(myCed == ){
-
-  //      }
-    }
-    return true;
-}
-
-int usersNum(){
-    Client client;
-    int counter = 0;
-    ifstream reader("./db/Users.txt", ios::in);
-    while (!reader.eof()) {
-
-    }
-    reader.close();    
-
-    return counter;
-}
 
 void seeUsers(){
     int counter = 0;
@@ -99,6 +75,39 @@ void seeUsers(){
 }
 
 
+void openImage(char path[]){
+    char filePath[] = "./public/";
+    strcat(filePath, path);
+    system(filePath);
+}
+
+
+void seeCars(){
+    int counter = 0;
+    Client client;
+
+    string id,Name,  year, cost, path; 
+    ifstream reader("./db/Cars.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> id;
+        reader >> Name;
+        reader >> year;
+        reader >> cost;
+        reader >> path;
+        if(id == ""){
+            printf("[-] No hay informacion para mostrar");
+        } else {
+            printf("*************************************** \n");
+            cout << "*\t" << id << ". "<< Name <<  "            *\n";
+            printf("***************************************\n");
+            cout << "Año: " << year <<  "\n";
+            cout << "Cost: " << cost <<  "\n";
+        }
+    }
+    reader.close();
+}
+
+
 
 void inClient(){
     Client client;
@@ -116,15 +125,23 @@ void inClient(){
 }
 
 void inNewCar(Car * car){
-    
     car->id = randomNum();
-    printf("Ingrese el modelo: ");
-    scanf(" %[^\n]",car->car.model);
+    ofstream myFile;
+    do{
+        printf("Ingrese el modelo: ");
+        scanf(" %[^\n]",car->car.model);
+        if (hasAlreadyExistCar(car->car.model))
+            printf("El modelo Ya está registrado");
+    }while(hasAlreadyExistCar(car->car.model));
     car->car.year =  validateYearCar();
-    printf("Ingrese el color: ");
-    scanf(" %[^\n]",car->car.model);
     car->car.price = validatePrice();
+    validatePath(car->car.photo);
+    myFile.open("./db/Cars.txt", ios::out | ios::app);
+    myFile<<car->id<<" "<<car->car.model<<" "<< car->car.price<<" "<< car->car.photo<<endl;
+    myFile.close();
+    system("clear");
 }
+
 
 void inNewSell(Sell *sell){
     sell->id = randomNum();
@@ -150,40 +167,71 @@ void findClient(){
     }while(!hasAlreadyExist(std::to_string(ced)) && ced == 8);
 }
 
+void findCar(){
+    string modelToFind;
+    system("clear");
+    do{
+        printf("Ingrese el modelo del auto que desea buscar o ingrese 8 para salir: ");
+        cin>>modelToFind;
+        if(modelToFind == "8"){
+            printf("Volviendo al menu principal....\n");
+            break;
+        }
+        if (!hasAlreadyExistCarPrint(modelToFind))
+            printf("[-] No se ha encontrado al auto \n");
+    }while(!hasAlreadyExistCar(modelToFind) && modelToFind == "8");
+}
+
 void menu(){
     int option;
     Client client;
     Car car;
     Sell sell;
     ofstream myFyle;
+    int carOptionView;
+    string modelToView;
     do {
         printMenu();
         scanf("%i",&option);
         switch (option) {
-            case 1:
+            case 1: //New Client DONE
                 system("clear");
                 inClient();
                 break;
 
-            case 2:
+            case 2: // Nuevo Auto DONE
                 inNewCar(&car);
                 break;
-            case 3:
+
+            case 3: // New Sell
                 inNewSell(&sell);
                 break;
 
-            case 7:
+            case 7: //See All clients DONE
                 system("clear");
                 seeUsers();
                 break;
+            
+            case 8: //See All Cars DONE
+                system("clear");
+                seeCars();
+                break;
 
-            case 9:
+            case 9: //Find Client Info DONE
                 system("clear");
                 findClient();
                 break;
-            case 13:
+            
+            case 10: //Find Car Info DONE
+                system("clear");
+                findCar();
+                break;
+        
+
+            case 13: //DONE
                 goodBye();
                 break;
+            
             default:
                 printf("La opcion que Ingresaste no existe");                
                 break;

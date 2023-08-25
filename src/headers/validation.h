@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -80,6 +81,52 @@ bool hasAlreadyExist(string cedToFind){
     return exist;
 }
 
+
+bool hasAlreadyExistCar(string modelToFind){
+    bool exist = false;
+    string id, Model, year, cost, path; 
+    ifstream reader("./db/Cars.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> id;
+        reader >> Model;
+        reader >> year;
+        reader >> cost;
+        reader >> path;
+        if(Model == modelToFind){
+            exist = true;
+            break;
+        }
+    }
+    reader.close();
+    return exist;
+}
+
+bool hasAlreadyExistCarPrint(string modelToFind){
+    char tagPath[100];
+    bool exist = false;
+    string id, Model, year, cost, path; 
+    ifstream reader("./db/Cars.txt", ios::in);
+    while (!reader.eof()) {
+        reader >> id;
+        reader >> Model;
+        reader >> year;
+        reader >> cost;
+        reader >> path;
+        if(Model == modelToFind){
+            printf("*************************************** \n");
+            cout << "*\t" << id << ". "<< Model <<  "            *\n";
+            printf("***************************************\n");
+            cout << "Año: " << year <<  "\n";
+            cout << "Cost: " << cost <<  "\n";
+            path = "xdg-open ./public/" + path;
+            system(strcpy(tagPath, path.c_str()));
+        }
+    }
+    reader.close();
+    return exist;
+}
+
+
 bool hasAlreadyExistPrint(string cedToFind){
     int counter = 0;
     bool exist = false;
@@ -117,6 +164,12 @@ bool validarEmailBool(char correo[dim]) {
     const regex expReg("[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}");
     return regex_match(correo, expReg);
 }
+
+bool validarPathBool(char myPath[dim]) {
+    const regex expReg("^[a-zA-Z0-9.]+$");
+    return regex_match(myPath, expReg);
+}
+
 
 bool validateDirectionBool(char direction[dim]){
     const regex expReg("^.{3,}$");
@@ -182,10 +235,10 @@ void validateMobile(char mobile[dim]){
 int validateYearCar(){
     int myYear;
     do{
-        printf("Ingrese el ano del carro: ");
+        printf("Ingrese el año del carro: ");
         scanf("%i",&myYear);
         if(!(myYear > 1950 && myYear < 2024))
-            printf("[-] Ano Invalido \n");
+            printf("[-] Año Invalido \n");
     }while(!(myYear > 1950 && myYear < 2024));
     return myYear;
 }
@@ -203,4 +256,14 @@ double validatePrice(){
 
 void getDataClient (long int *cedToFind) {
     scanf("%li",&cedToFind);
+}
+
+void validatePath(char myPath[dim]){
+    printf("Recuerda que la foto debe ser añadido manualmente al directorio ./public\n");
+    do {
+        printf("Ingrese el nombre de la Imagen: ");
+        scanf(" %[^\n]", myPath);
+        if(!validarPathBool(myPath))
+            printf("[-] Ruta no válida\n");
+    }while(!validarPathBool(myPath));  
 }
